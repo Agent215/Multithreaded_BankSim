@@ -30,19 +30,25 @@ public class Bank {
         if (accounts[from].withdraw(amount)) {
             accounts[to].deposit(amount);
         }
+        if (shouldTest()) test();
     }
 
     public void test() {
         int sum = 0;
         for (int i = 0; i < accounts.length; i++) {
-            System.out.println(accounts[i]);
+            System.out.printf("%s %s%n", 
+                    Thread.currentThread().toString(),accounts[i].toString());
             sum += accounts[i].getBalance();
         }
-        System.out.println(" Sum: " + sum);
+        System.out.println(Thread.currentThread().toString() + 
+                " Sum: " + sum);
         if (sum != numAccounts * initialBalance) {
-            System.out.println("Money was gained or lost");
+            System.out.println(Thread.currentThread().toString() + 
+                    " Money was gained or lost");
+            System.exit(1);
         } else {
-            System.out.println("The bank is in balance");
+            System.out.println(Thread.currentThread().toString() + 
+                    " The bank is in balance");
         }
     }
 
@@ -61,6 +67,10 @@ public class Bank {
                 account.notifyAll();
             }
         }
+    }
+    
+    public synchronized boolean shouldTest() {
+        return ++ntransacts % NTEST == 0;
     }
 
 }

@@ -7,7 +7,7 @@ package edu.temple.cis.c3238.banksim;
 class Bank {
 
     public static final int NTEST = 10;
-    private int[] accounts;
+    private Account[] accounts;
     private long ntransacts = 0;
     private int initialBalance;
     private int numAccounts;
@@ -15,32 +15,24 @@ class Bank {
     public Bank(int numAccounts, int initialBalance) {
         this.initialBalance = initialBalance;
         this.numAccounts = numAccounts;
-        accounts = new int[numAccounts];
+        accounts = new Account[numAccounts];
         for (int i = 0; i < accounts.length; i++) {
-            accounts[i] = initialBalance;
+            accounts[i] = new Account(i, initialBalance);
         }
         ntransacts = 0;
     }
 
-    public synchronized void transfer(int from, int to, int amount) {
-        if (accounts[from] < amount) {
-            return;
+    public void transfer(int from, int to, int amount) {
+        if (accounts[from].withdraw(amount)) {
+            accounts[to].deposit(amount);
         }
-        int fromOldBalance = accounts[from];
-        Thread.yield();
-        int fromNewBalance = fromOldBalance - amount;
-        accounts[from] = fromNewBalance;
-        Thread.yield();
-        int toOldBalance = accounts[to];
-        int toNewBalance = toOldBalance + amount;
-        accounts[to] = toNewBalance;
     }
 
     public void test() {
         int sum = 0;
         for (int i = 0; i < accounts.length; i++) {
-            System.out.printf("Account[%d] %d%n", i, accounts[i]);
-            sum += accounts[i];
+            System.out.println(accounts[i]);
+            sum += accounts[i].getBalance();
         }
         System.out.println(" Sum: " + sum);
         if (sum != numAccounts * initialBalance) {

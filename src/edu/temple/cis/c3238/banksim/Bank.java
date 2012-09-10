@@ -22,7 +22,7 @@ class Bank {
         ntransacts = 0;
     }
 
-    public void transfer(int from, int to, int amount) {
+    public synchronized void transfer(int from, int to, int amount) {
         if (accounts[from] < amount) {
             return;
         }

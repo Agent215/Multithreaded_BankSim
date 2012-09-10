@@ -8,8 +8,10 @@ public class Account {
 
     private int balance;
     private int id;
+    private Bank myBank;
 
-    public Account(int id, int initialBalance) {
+    public Account(Bank myBank, int id, int initialBalance) {
+        this.myBank = myBank;
         this.id = id;
         balance = initialBalance;
     }
@@ -19,7 +21,7 @@ public class Account {
     }
     
     public synchronized void waitForAvailableFunds(int amount) {
-        while (amount >= balance) {
+        while (myBank.isOpen() && amount >= balance) {
             try {
                 wait();
             } catch (InterruptedException ex) { /* ignore */ }
@@ -45,7 +47,7 @@ public class Account {
         balance = newBalance;
         notifyAll();
     }
-
+    
     @Override
     public String toString() {
         return String.format("Account[%d] balance %d", id, balance);

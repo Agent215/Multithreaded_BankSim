@@ -27,8 +27,10 @@ class Bank {
             return;
         }
         int fromOldBalance = accounts[from];
+        Thread.yield();
         int fromNewBalance = fromOldBalance - amount;
         accounts[from] = fromNewBalance;
+        Thread.yield();
         int toOldBalance = accounts[to];
         int toNewBalance = toOldBalance + amount;
         accounts[to] = toNewBalance;

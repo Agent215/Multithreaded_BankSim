@@ -5,6 +5,10 @@ package edu.temple.cis.c3238.banksim;
  */
 class TransferThread extends Thread {
 
+    private final Bank bank;
+    private final int fromAccount;
+    private final int maxAmount;
+
     public TransferThread(Bank b, int from, int max) {
         bank = b;
         fromAccount = from;
@@ -20,7 +24,4 @@ class TransferThread extends Thread {
         }
         bank.closeBank();
     }
-    private Bank bank;
-    private int fromAccount;
-    private int maxAmount;
 }

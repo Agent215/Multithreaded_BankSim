@@ -7,10 +7,10 @@ package edu.temple.cis.c3238.banksim;
 public class Bank {
 
     public static final int NTEST = 10;
-    private Account[] accounts;
+    private final Account[] accounts;
     private long ntransacts = 0;
-    private int initialBalance;
-    private int numAccounts;
+    private final int initialBalance;
+    private final int numAccounts;
     private boolean open;
 
     public Bank(int numAccounts, int initialBalance) {
@@ -35,10 +35,10 @@ public class Bank {
 
     public void test() {
         int sum = 0;
-        for (int i = 0; i < accounts.length; i++) {
+        for (Account account : accounts) {
             System.out.printf("%s %s%n", 
-                    Thread.currentThread().toString(),accounts[i].toString());
-            sum += accounts[i].getBalance();
+                    Thread.currentThread().toString(), account.toString());
+            sum += account.getBalance();
         }
         System.out.println(Thread.currentThread().toString() + 
                 " Sum: " + sum);

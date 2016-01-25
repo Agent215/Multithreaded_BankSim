@@ -6,9 +6,9 @@ package edu.temple.cis.c3238.banksim;
  */
 public class Account {
 
-    private int balance;
-    private int id;
-    private Bank myBank;
+    private volatile int balance;
+    private final int id;
+    private final Bank myBank;
 
     public Account(Bank myBank, int id, int initialBalance) {
         this.myBank = myBank;

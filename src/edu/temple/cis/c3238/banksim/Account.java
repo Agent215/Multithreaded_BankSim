@@ -3,6 +3,7 @@ package edu.temple.cis.c3238.banksim;
 /**
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
+ * @author Modified by Charles Wang
  */
 public class Account {
 
@@ -19,19 +20,11 @@ public class Account {
     public int getBalance() {
         return balance;
     }
-    
-    public synchronized void waitForAvailableFunds(int amount) {
-        while (myBank.isOpen() && amount >= balance) {
-            try {
-                wait();
-            } catch (InterruptedException ex) { /* ignore */ }
-        }
-    }
 
-    public synchronized boolean withdraw(int amount) {
+    public boolean withdraw(int amount) {
         if (amount <= balance) {
             int currentBalance = balance;
-            Thread.yield(); // Try to force collision
+//            Thread.yield(); // Try to force collision
             int newBalance = currentBalance - amount;
             balance = newBalance;
             return true;
@@ -40,12 +33,11 @@ public class Account {
         }
     }
 
-    public synchronized void deposit(int amount) {
+    public void deposit(int amount) {
         int currentBalance = balance;
-        Thread.yield();   // Try to force collision
+//        Thread.yield();   // Try to force collision
         int newBalance = currentBalance + amount;
         balance = newBalance;
-        notifyAll();
     }
     
     @Override

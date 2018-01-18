@@ -3,6 +3,7 @@ package edu.temple.cis.c3238.banksim;
 /**
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
+ * @author Modified by Charles Wang
  */
 public class BankSimMain {
 
@@ -17,15 +18,9 @@ public class BankSimMain {
             threads[i] = new TransferThread(b, i, INITIAL_BALANCE);
             threads[i].start();
         }
-        // Wait for all threads to finish
-        for (int i = 0; i < NACCOUNTS; i++) {
-            try {
-                threads[i].join();
-            } catch (InterruptedException ex) {
-                // Ignore this
-            }
-        }
-        b.test();
+
+//        b.test();
+          System.out.printf("Bank transfer is in the process.\n");
     }
 }
 

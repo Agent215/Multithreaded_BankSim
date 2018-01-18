@@ -3,7 +3,9 @@ package edu.temple.cis.c3238.banksim;
 /**
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
+ * @author Modified by Charles Wang
  */
+
 public class Bank {
 
     public static final int NTEST = 10;
@@ -11,10 +13,8 @@ public class Bank {
     private long ntransacts = 0;
     private final int initialBalance;
     private final int numAccounts;
-    private boolean open;
 
     public Bank(int numAccounts, int initialBalance) {
-        open = true;
         this.initialBalance = initialBalance;
         this.numAccounts = numAccounts;
         accounts = new Account[numAccounts];
@@ -25,8 +25,7 @@ public class Bank {
     }
 
     public void transfer(int from, int to, int amount) {
-        accounts[from].waitForAvailableFunds(amount);
-        if (!open) return;
+//        accounts[from].waitForAvailableFunds(amount);
         if (accounts[from].withdraw(amount)) {
             accounts[to].deposit(amount);
         }
@@ -56,20 +55,8 @@ public class Bank {
         return accounts.length;
     }
     
-    public synchronized boolean isOpen() {return open;}
     
-    public void closeBank() {
-        synchronized (this) {
-            open = false;
-        }
-        for (Account account : accounts) {
-            synchronized(account) {
-                account.notifyAll();
-            }
-        }
-    }
-    
-    public synchronized boolean shouldTest() {
+    public boolean shouldTest() {
         return ++ntransacts % NTEST == 0;
     }
 

@@ -2,7 +2,7 @@
 
 The purpose of this lab assignment is to observe and resolve the race condition in a multi-thread program. You are given the initial source code of a bank fund transferring simulation program as described in the class. The initial program does not have any means to protect the critical part of the code to prevent race condition. So race condition always happens when it runs. Here are the tasks you have to do (in that order) and their requirements.
 
-Task 1. Run the initial program as is to observe race condition and explain how a race condition may occur.
+Task 1. Run the initial program as is to observe race condition and explain how a race condition may occur. Draw a simple  UML sequence diagram to support your explanation. Add your explanation and the sequence diagram to [README.md](README.md)
 
 Task 2. Implement protection code to resolve the race condition issue. We may use either synchronized object locks or ReentrantLock class to prevent two treads from having access the same global variables simultaneously. You solution must allow the bank to transfer multiple fund between unrelated accounts, e.g. from account [2] to account [5] and from account [3] to account [7] at the same time.
 

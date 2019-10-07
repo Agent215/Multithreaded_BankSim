@@ -43,11 +43,11 @@ public class Bank {
                 " Sum: " + sum);
         if (sum != numAccounts * initialBalance) {
             System.out.println(Thread.currentThread().toString() + 
-                    " Money was gained or lost");
+                    " Money was gained or lost!");
             System.exit(1);
         } else {
             System.out.println(Thread.currentThread().toString() + 
-                    " The bank is in balance");
+                    " The bank is in balance!");
         }
     }
 

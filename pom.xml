@@ -5,6 +5,7 @@
   <artifactId>BankSim</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>BankSim</name>
+
   <url>https://maven.apache.org</url>
   <!-- Overwrite default repositories for Maven bundled with NetBeans 8.2.
        See https://www.alphabot.com/security/blog/2020/java/Your-Java-builds-might-break-starting-January-13th.html

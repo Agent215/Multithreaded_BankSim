@@ -4,13 +4,15 @@ package edu.temple.cis.c3238.banksim;
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
  * @author Modified by Charles Wang
+ * @author Modified by Alexa Delacenserie
+ * @author Modified by Tarek Elseify
  */
 
 public class Bank {
 
     public static final int NTEST = 10;
     private final Account[] accounts;
-    private long ntransacts = 0;
+    private long numTransactions = 0;
     private final int initialBalance;
     private final int numAccounts;
 
@@ -19,45 +21,44 @@ public class Bank {
         this.numAccounts = numAccounts;
         accounts = new Account[numAccounts];
         for (int i = 0; i < accounts.length; i++) {
-            accounts[i] = new Account(this, i, initialBalance);
+            accounts[i] = new Account(i, initialBalance);
         }
-        ntransacts = 0;
+        numTransactions = 0;
     }
 
     public void transfer(int from, int to, int amount) {
-//        accounts[from].waitForAvailableFunds(amount);
+        // accounts[from].waitForAvailableFunds(amount);
         if (accounts[from].withdraw(amount)) {
             accounts[to].deposit(amount);
         }
-        if (shouldTest()) test();
+        
+        // Uncomment line when race condition in test() is fixed.
+        // if (shouldTest()) test();
     }
 
     public void test() {
-        int sum = 0;
+        int totalBalance = 0;
         for (Account account : accounts) {
-            System.out.printf("%s %s%n", 
+            System.out.printf("%-30s %s%n", 
                     Thread.currentThread().toString(), account.toString());
-            sum += account.getBalance();
+            totalBalance += account.getBalance();
         }
-        System.out.println(Thread.currentThread().toString() + 
-                " Sum: " + sum);
-        if (sum != numAccounts * initialBalance) {
-            System.out.println(Thread.currentThread().toString() + 
-                    " Money was gained or lost!");
+        System.out.printf("%-30s Total balance: %d\n", Thread.currentThread().toString(), totalBalance);
+        if (totalBalance != numAccounts * initialBalance) {
+            System.out.printf("%-30s Total balance changed!\n", Thread.currentThread().toString());
             System.exit(0);
         } else {
-            System.out.println(Thread.currentThread().toString() + 
-                    " The bank is in balance!");
+            System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
         }
     }
 
-    public int size() {
-        return accounts.length;
+    public int getNumAccounts() {
+        return numAccounts;
     }
     
     
     public boolean shouldTest() {
-        return ++ntransacts % NTEST == 0;
+        return ++numTransactions % NTEST == 0;
     }
 
 }

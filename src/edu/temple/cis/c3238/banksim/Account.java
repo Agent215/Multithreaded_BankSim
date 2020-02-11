@@ -4,17 +4,17 @@ package edu.temple.cis.c3238.banksim;
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
  * @author Modified by Charles Wang
+ * @author Modified by Alexa Delacenserie
+ * @author Modified by Tarek Elseify
  */
 public class Account {
 
     private volatile int balance;
     private final int id;
-    private final Bank myBank;
 
-    public Account(Bank myBank, int id, int initialBalance) {
-        this.myBank = myBank;
+    public Account(int id, int initialBalance) {
         this.id = id;
-        balance = initialBalance;
+        this.balance = initialBalance;
     }
 
     public int getBalance() {
@@ -24,7 +24,7 @@ public class Account {
     public boolean withdraw(int amount) {
         if (amount <= balance) {
             int currentBalance = balance;
-//            Thread.yield(); // Try to force collision
+            // Thread.yield(); // Try to force collision
             int newBalance = currentBalance - amount;
             balance = newBalance;
             return true;
@@ -35,7 +35,7 @@ public class Account {
 
     public void deposit(int amount) {
         int currentBalance = balance;
-//        Thread.yield();   // Try to force collision
+        // Thread.yield();   // Try to force collision
         int newBalance = currentBalance + amount;
         balance = newBalance;
     }

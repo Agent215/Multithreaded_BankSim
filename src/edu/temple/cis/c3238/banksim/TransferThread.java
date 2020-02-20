@@ -1,4 +1,9 @@
 package edu.temple.cis.c3238.banksim;
+
+import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
@@ -16,7 +21,7 @@ class TransferThread extends Thread {
         bank = b;
         fromAccount = from;
         maxAmount = max;
-    }
+    } // end TransferThread
 
     @Override
     public void run() {
@@ -25,7 +30,8 @@ class TransferThread extends Thread {
             int amount = (int) (maxAmount * Math.random());
             bank.transfer(fromAccount, toAccount, amount);
         }
-
+        //this.bank.closeBank();
+        //  System.out.println("**closing a bank account");
         System.out.printf("%-30s Account[%d] has finished with its transactions.\n", Thread.currentThread().toString(), fromAccount);
-    }
-}
+    } // end run
+} // end TransferThread

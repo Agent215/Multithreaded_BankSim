@@ -26,5 +26,4 @@ public class TestingThread extends Thread {
             System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
         }
 	}
-
 }

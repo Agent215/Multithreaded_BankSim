@@ -26,12 +26,19 @@ class TransferThread extends Thread {
     @Override
     public void run() {
         for (int i = 0; i < 10000; i++) {
-            int toAccount = (int) (bank.getNumAccounts() * Math.random());
-            int amount = (int) (maxAmount * Math.random());
-            bank.transfer(fromAccount, toAccount, amount);
+            if (this.bank.isOpen) {
+                int toAccount = (int) (bank.getNumAccounts() * Math.random());
+                int amount = (int) (maxAmount * Math.random());
+                bank.transfer(fromAccount, toAccount, amount);
+            } else {
+                return;
+            }
         }
+
         //this.bank.closeBank();
         //  System.out.println("**closing a bank account");
         System.out.printf("%-30s Account[%d] has finished with its transactions.\n", Thread.currentThread().toString(), fromAccount);
+        this.bank.closeBank();
+
     } // end run
 } // end TransferThread

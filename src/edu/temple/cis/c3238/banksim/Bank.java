@@ -18,8 +18,8 @@ public class Bank {
     private final int initialBalance;
     private final int numAccounts;
     private boolean startTest;
-    private int semaphoreCounter;
-    private boolean isOpen;
+    public int semaphoreCounter;
+    public boolean isOpen;
     private boolean ShouldTest = false;
 
     public Bank(int numAccounts, int initialBalance) {
@@ -37,88 +37,61 @@ public class Bank {
 
     // I'm pretty sure this is wrong.  A thread can be interrupted between calling waitFor and withdraw
     // we haven't actually solved waiting it's just less likely.  I think the check should be within transfer
-    
     public void transfer(int from, int to, int amount) {
+
+        if (isOpen == false) {
+            System.out.println("***** i am here");
+            return;
+        }
         //accounts[from].waitForAvailableFunds(amount);
         if (accounts[from].withdraw(amount)) {
             accounts[to].deposit(amount);
         }
-        
+
         // Uncomment line when race condition in test() is fixed.
         if (shouldTest() || startTest) {
-        	startTest = true;
-        	test();
+            startTest = true;
+            test();
         }
     }
 
     public synchronized void test() {
-    	if (semaphoreCounter-- != 0)
+
+        if (this.isOpen == true) {
+            if (semaphoreCounter-- != 0)
 			try {
-				wait();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		else {
-	    	int totalBalance = 0;
-	        for (Account account : accounts) {
-	            System.out.printf("%-30s %s%n", 
-	                    Thread.currentThread().toString(), account.toString());
-	            totalBalance += account.getBalance();
-	        }
-	        System.out.printf("%-30s Total balance: %d\n", Thread.currentThread().toString(), totalBalance);
-	        if (totalBalance != numAccounts * initialBalance) {
-	            System.out.printf("%-30s Total balance changed!\n", Thread.currentThread().toString());
-	            System.exit(0);
-	        } else {
-	            System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
-	        }
-	        semaphoreCounter = 9;
-	        notifyAll();
-    	}
-    }
-/*
-        if (!this.isOpen) {
-            return;
-        }
-        // accounts[from].waitForAvailableFunds(amount);
-        if (accounts[from].withdraw(amount)) {
-            accounts[to].deposit(amount);
-        }
 
-    }
-*/
-/*    public void test() {
-
-        synchronized (this) {
-
-            int totalBalance = 0;
-            for (Account account : accounts) {
-                System.out.printf("%-30s %s%n",
-                        Thread.currentThread().toString(), account.toString());
-                totalBalance += account.getBalance();
-            }
-            System.out.printf("%-30s Total balance: %d\n", Thread.currentThread().toString(), totalBalance);
-            if (totalBalance != numAccounts * initialBalance) {
-                System.out.printf("%-30s Total balance changed!\n", Thread.currentThread().toString());
-                System.exit(0);
+                wait();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             } else {
-                System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
+                int totalBalance = 0;
+                for (Account account : accounts) {
+                    System.out.printf("%-30s %s%n",
+                            Thread.currentThread().toString(), account.toString());
+                    totalBalance += account.getBalance();
+                }
+                System.out.printf("%-30s Total balance: %d\n", Thread.currentThread().toString(), totalBalance);
+                if (totalBalance != numAccounts * initialBalance) {
+                    System.out.printf("%-30s Total balance changed!\n", Thread.currentThread().toString());
+                    System.exit(0);
+                } else {
+                    System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
+                }
+                semaphoreCounter = 9;
+                startTest = false;
+                notifyAll();
+
             }
-            notifyAll();
+        }
+    }
 
-        } // end synchronized
-
-        // notifyAll();
-    } // end test
-*/
     public int getNumAccounts() {
         return numAccounts;
     }
-    
-    
-    //This isn't actually accurate but doesn't really affect anything
 
+    //This isn't actually accurate but doesn't really affect anything
     public boolean getIsOpen() {
         return isOpen;
     }
@@ -127,9 +100,27 @@ public class Bank {
         return accounts.length;
     }
 
-    public void closeBank() {
+    synchronized boolean isOpen() {
+        return isOpen;
+    }
 
-        this.isOpen = false;
+    public void closeBank() {
+        synchronized (this) {
+            this.isOpen = false;
+        }
+
+        for (Account acc : this.accounts) {
+            synchronized (acc) {
+                acc.notifyAll();
+
+            }
+
+            synchronized (this) {
+
+                this.notifyAll();
+            }
+
+        }
     }
 
     public boolean GetShouldTest() {
@@ -144,6 +135,11 @@ public class Bank {
             this.ShouldTest = false;
         }
         return ++numTransactions % NTEST == 0;
+    }
+
+    public synchronized void setSem(int value) {
+
+        this.semaphoreCounter = value;
     }
 
 }

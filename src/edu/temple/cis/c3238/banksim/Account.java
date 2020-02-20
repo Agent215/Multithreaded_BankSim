@@ -42,35 +42,24 @@ public class Account {
     }
 
     public synchronized void deposit(int amount) {
-//        while (this.bank.shouldTest()) {
-//
-//            try {
-//                System.out.println("**should be waiting now");
-//                System.out.println("**should be testing now");
-//                this.wait();
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//
-//        }
+
         int currentBalance = balance;
         Thread.yield();   // Try to force collision
         int newBalance = currentBalance + amount;
         balance = newBalance;
         notifyAll();
     }
-    
-    public synchronized void waitForAvailableFunds (int amount) {
-    	while (amount > balance) {
-    		try {
-				wait();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
+
+    public synchronized void waitForAvailableFunds(int amount) {
+        while (amount > balance) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
-    
 
 // get the current thread 
     public synchronized Thread getThread() {

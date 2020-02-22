@@ -1,7 +1,5 @@
 package edu.temple.cis.c3238.banksim;
 
-import test.Account;
-
 /**
  *
  */

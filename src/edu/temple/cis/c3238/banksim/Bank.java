@@ -41,8 +41,8 @@ public class Bank {
     public void transfer(int from, int to, int amount) {
     	
         accounts[from].waitForAvailableFunds(amount);
+    	atom.incrementAndGet();
         if (accounts[from].withdraw(amount)) {
-        	atom.incrementAndGet();
             accounts[to].deposit(amount);
         }
         atom.decrementAndGet();
@@ -71,7 +71,23 @@ public class Bank {
 			}
     	}
 		System.out.printf("atom is %d\n", atom.get());
-		testingThread.run();
+		if (atom.get() == 0) {
+			System.out.printf("atom is %d\n", atom.get());
+	    	int totalBalance = 0;
+	        for (Account account : accounts) {
+	            System.out.printf("%-30s %s%n", 
+	                    Thread.currentThread().toString(), account.toString());
+	            totalBalance += account.getBalance();
+	        }
+	        System.out.printf("%-30s Total balance: %d\n", Thread.currentThread().toString(), totalBalance);
+	        if (totalBalance != numAccounts * initialBalance) {
+	            System.out.printf("%-30s Total balance changed!\n", Thread.currentThread().toString());
+	            System.exit(0);
+	        } else {
+	            System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
+	        }
+		}
+			//testingThread.run();
 		notifyAll();
     }
 

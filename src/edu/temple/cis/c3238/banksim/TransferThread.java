@@ -16,23 +16,33 @@ class TransferThread extends Thread {
     private final Bank bank;
     private final int fromAccount;
     private final int maxAmount;
+    private Semaphore testingSemaphore;
 
-    public TransferThread(Bank b, int from, int max) {
+    public TransferThread(Bank b, int from, int max, Semaphore testingSemaphore) {
         bank = b;
         fromAccount = from;
         maxAmount = max;
+        this.testingSemaphore = testingSemaphore;
     } // end TransferThread
 
     @Override
     public void run() {
-        for (int i = 0; i < 10000; i++) {
-            if (this.bank.isOpen) {
+
+        for (int i = 0; i < 100; i++) {
+        	while (bank.shouldTest()) {
+                //System.out.printf("%-30s yielding should test : %s\n", Thread.currentThread().toString(), bank.shouldTest());
+        		yield();
+        		if (!bank.isOpen()) {
+                    break;
+        		}
+        	}
+        	testingSemaphore.acquireUninterruptibly();
                 int toAccount = (int) (bank.getNumAccounts() * Math.random());
                 int amount = (int) (maxAmount * Math.random());
                 bank.transfer(fromAccount, toAccount, amount);
-            } else {
-                return;
-            }
+                bank.countTransaction();
+                //System.out.printf("%-30s ran\n", Thread.currentThread().toString());
+        	testingSemaphore.release();
         }
 
         //this.bank.closeBank();

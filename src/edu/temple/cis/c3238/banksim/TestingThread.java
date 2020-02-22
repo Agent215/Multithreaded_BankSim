@@ -1,29 +1,38 @@
 package edu.temple.cis.c3238.banksim;
 
+import java.util.concurrent.Semaphore;
+
 public class TestingThread extends Thread {
 	
-    private Account[] accounts;
-    private int initialBalance;
+    private Bank bank;
+    private int naccounts;
+    private Semaphore testingSemaphore;
 
-    public TestingThread (Account[] accounts, int initialBalance) {
-    	this.accounts = accounts;
-    	this.initialBalance = initialBalance;
+    public TestingThread (Bank bank, int naccounts, Semaphore testingSemaphore) {
+    	this.bank = bank;
+    	this.naccounts = naccounts;
+    	this.testingSemaphore = testingSemaphore;
     }
     
 	@Override
 	public void run() {
-    	int totalBalance = 0;
-        for (Account account : accounts) {
-            System.out.printf("%-30s %s%n", 
-                    Thread.currentThread().toString(), account.toString());
-            totalBalance += account.getBalance();
-        }
-        System.out.printf("%-30s Total balance: %d\n", Thread.currentThread().toString(), totalBalance);
-        if (totalBalance != accounts.length * initialBalance) {
-            System.out.printf("%-30s Total balance changed!\n", Thread.currentThread().toString());
-            System.exit(0);
-        } else {
-            System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
-        }
+		while(bank.isOpen) {
+			
+			if (bank.getLastTest() != bank.getNumTransactions()) {
+				testingSemaphore.acquireUninterruptibly(naccounts);
+					if (bank.shouldTest()) {
+						bank.test();
+						bank.resetTestBoolean();
+						bank.updateLastTest();
+						bank.countTransaction();
+					}
+					testingSemaphore.release(naccounts);
+			} else {
+				//bank.resetTestBoolean();
+                System.out.printf("%-30s yielding should test : %s\n", Thread.currentThread().toString(), bank.shouldTest());
+                //System.out.printf("%d %d\n", bank.getLastTest(), bank.getNumTransactions());
+				yield();
+			}
+		}
 	}
 }

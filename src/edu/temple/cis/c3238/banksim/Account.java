@@ -50,14 +50,8 @@ public class Account {
         notifyAll();
     }
 
-    public synchronized void waitForAvailableFunds(int amount) {
+    public void waitForAvailableFunds(int amount) {
         while (amount > balance) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
         }
     }
 

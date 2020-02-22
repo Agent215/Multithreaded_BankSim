@@ -21,6 +21,7 @@ public class Bank {
     public int semaphoreCounter;
     public boolean isOpen;
     private boolean ShouldTest = false;
+    private long lastTest;
 
     public Bank(int numAccounts, int initialBalance) {
         this.initialBalance = initialBalance;
@@ -32,6 +33,7 @@ public class Bank {
         numTransactions = 0;
         semaphoreCounter = 9;
         this.isOpen = true;
+        startTest = false;
         this.ShouldTest = false;
     }
 
@@ -49,41 +51,25 @@ public class Bank {
         }
 
         // Uncomment line when race condition in test() is fixed.
-        if (shouldTest() || startTest) {
-            startTest = true;
-            test();
-        }
+        //if (shouldTest() || startTest) {
+        //    startTest = true;
+        //    test();
+        //}
     }
 
-    public synchronized void test() {
-
-        if (this.isOpen == true) {
-            if (semaphoreCounter-- != 0)
-			try {
-
-                wait();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } else {
-                int totalBalance = 0;
-                for (Account account : accounts) {
-                    System.out.printf("%-30s %s%n",
-                            Thread.currentThread().toString(), account.toString());
-                    totalBalance += account.getBalance();
-                }
-                System.out.printf("%-30s Total balance: %d\n", Thread.currentThread().toString(), totalBalance);
-                if (totalBalance != numAccounts * initialBalance) {
-                    System.out.printf("%-30s Total balance changed!\n", Thread.currentThread().toString());
-                    System.exit(0);
-                } else {
-                    System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
-                }
-                semaphoreCounter = 9;
-                startTest = false;
-                notifyAll();
-
-            }
+    public  void test() {
+        int totalBalance = 0;
+        for (Account account : accounts) {
+            System.out.printf("%-30s %s%n",
+                    Thread.currentThread().toString(), account.toString());
+            totalBalance += account.getBalance();
+        }
+        System.out.printf("%-30s Total balance: %d\n", Thread.currentThread().toString(), totalBalance);
+        if (totalBalance != numAccounts * initialBalance) {
+            System.out.printf("%-30s Total balance changed!\n", Thread.currentThread().toString());
+            System.exit(0);
+        } else {
+            System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
         }
     }
 
@@ -128,18 +114,30 @@ public class Bank {
         return this.ShouldTest;
     }
 
+    public void countTransaction() {
+    	numTransactions++;
+    }
+    
     public boolean shouldTest() {
-        if (numTransactions % NTEST == 0) {
-            this.ShouldTest = true;
-        } else {
-            this.ShouldTest = false;
-        }
-        return ++numTransactions % NTEST == 0;
+        if (!(numTransactions == 0) && (numTransactions % NTEST == 0))
+            this.startTest = true;
+        return startTest;
+    }
+    
+    public void resetTestBoolean() {
+    	this.startTest = false;
     }
 
-    public synchronized void setSem(int value) {
-
-        this.semaphoreCounter = value;
+    public void updateLastTest() {
+        this.lastTest = numTransactions;
+    }
+    
+    public long getLastTest() {
+    	return lastTest;
+    }
+    
+    public long getNumTransactions() {
+    	return numTransactions;
     }
 
 }

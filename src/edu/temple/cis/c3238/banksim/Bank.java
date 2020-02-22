@@ -1,7 +1,9 @@
 package edu.temple.cis.c3238.banksim;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Cay Horstmann
@@ -10,6 +12,7 @@ import java.util.logging.Logger;
  * @author Modified by Alexa Delacenserie
  * @author Modified by Tarek Elseify
  */
+
 public class Bank {
 
     public static final int NTEST = 10;
@@ -17,127 +20,77 @@ public class Bank {
     private long numTransactions = 0;
     private final int initialBalance;
     private final int numAccounts;
-    private boolean startTest;
-    public int semaphoreCounter;
-    public boolean isOpen;
-    private boolean ShouldTest = false;
-    private long lastTest;
+    private CyclicBarrier barrier;
+    Runnable testingThread;
+    private boolean open = true;
+    AtomicInteger atom;
 
     public Bank(int numAccounts, int initialBalance) {
         this.initialBalance = initialBalance;
         this.numAccounts = numAccounts;
         accounts = new Account[numAccounts];
         for (int i = 0; i < accounts.length; i++) {
-            accounts[i] = new Account(i, initialBalance, this);
+            accounts[i] = new Account(this, i, initialBalance);
         }
         numTransactions = 0;
-        semaphoreCounter = 9;
-        this.isOpen = true;
-        startTest = false;
-        this.ShouldTest = false;
+    	testingThread = new TestingThread(accounts, numAccounts, initialBalance);
+    	barrier = new CyclicBarrier(numAccounts, testingThread);
+    	atom = new AtomicInteger(0);
     }
 
-    // I'm pretty sure this is wrong.  A thread can be interrupted between calling waitFor and withdraw
-    // we haven't actually solved waiting it's just less likely.  I think the check should be within transfer
     public void transfer(int from, int to, int amount) {
-
-        if (isOpen == false) {
-            System.out.println("***** i am here");
-            return;
-        }
-        //accounts[from].waitForAvailableFunds(amount);
+    	
+        accounts[from].waitForAvailableFunds(amount);
         if (accounts[from].withdraw(amount)) {
+        	atom.incrementAndGet();
             accounts[to].deposit(amount);
         }
-
+        atom.decrementAndGet();
+        Thread.yield();
         // Uncomment line when race condition in test() is fixed.
-        //if (shouldTest() || startTest) {
-        //    startTest = true;
-        //    test();
-        //}
+        if (shouldTest()) test();
     }
 
-    public  void test() {
-        int totalBalance = 0;
-        for (Account account : accounts) {
-            System.out.printf("%-30s %s%n",
-                    Thread.currentThread().toString(), account.toString());
-            totalBalance += account.getBalance();
-        }
-        System.out.printf("%-30s Total balance: %d\n", Thread.currentThread().toString(), totalBalance);
-        if (totalBalance != numAccounts * initialBalance) {
-            System.out.printf("%-30s Total balance changed!\n", Thread.currentThread().toString());
-            System.exit(0);
-        } else {
-            System.out.printf("%-30s Total balance unchanged.\n", Thread.currentThread().toString());
-        }
+    public synchronized void test() {
+/*    	try {
+			barrier.await();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+    	while ((atom.get() != 0) && isOpen()){
+    		try {
+				wait(10);
+				//System.out.printf("QWERTY %d\n", atom.get());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+		System.out.printf("atom is %d\n", atom.get());
+		testingThread.run();
+		notifyAll();
     }
 
     public int getNumAccounts() {
         return numAccounts;
     }
-
-    //This isn't actually accurate but doesn't really affect anything
-    public boolean getIsOpen() {
-        return isOpen;
-    }
-
-    public int size() {
-        return accounts.length;
-    }
-
-    synchronized boolean isOpen() {
-        return isOpen;
-    }
-
-    public void closeBank() {
-        synchronized (this) {
-            this.isOpen = false;
-        }
-
-        for (Account acc : this.accounts) {
-            synchronized (acc) {
-                acc.notifyAll();
-
-            }
-
-            synchronized (this) {
-
-                this.notifyAll();
-            }
-
-        }
-    }
-
-    public boolean GetShouldTest() {
-
-        return this.ShouldTest;
-    }
-
-    public void countTransaction() {
-    	numTransactions++;
-    }
     
     public boolean shouldTest() {
-        if (!(numTransactions == 0) && (numTransactions % NTEST == 0))
-            this.startTest = true;
-        return startTest;
+        return ++numTransactions % NTEST == 0;
     }
     
-    public void resetTestBoolean() {
-    	this.startTest = false;
-    }
-
-    public void updateLastTest() {
-        this.lastTest = numTransactions;
-    }
+    synchronized boolean isOpen() {return open;}
     
-    public long getLastTest() {
-    	return lastTest;
+    void closeBank() {
+        synchronized (this) {
+            open = false;
+        }
+        for (Account account : accounts) {
+            synchronized (account) {account.notifyAll();}
+        }
     }
-    
-    public long getNumTransactions() {
-    	return numTransactions;
-    }
-
 }

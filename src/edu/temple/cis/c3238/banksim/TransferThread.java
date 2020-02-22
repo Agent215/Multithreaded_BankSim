@@ -1,4 +1,5 @@
 package edu.temple.cis.c3238.banksim;
+
 /**
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
@@ -21,11 +22,15 @@ class TransferThread extends Thread {
     @Override
     public void run() {
         for (int i = 0; i < 10000; i++) {
+        	if (!bank.isOpen()) {
+        		break;
+        	}
             int toAccount = (int) (bank.getNumAccounts() * Math.random());
             int amount = (int) (maxAmount * Math.random());
             bank.transfer(fromAccount, toAccount, amount);
+            //System.out.printf("%-30s Account[%d] to [%d] for %d\n", Thread.currentThread().toString(), fromAccount, toAccount, amount);
         }
-
+        bank.closeBank();
         System.out.printf("%-30s Account[%d] has finished with its transactions.\n", Thread.currentThread().toString(), fromAccount);
     }
 }

@@ -1,5 +1,7 @@
 package edu.temple.cis.c3238.banksim;
 
+import java.util.concurrent.CyclicBarrier;
+
 /**
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
@@ -11,17 +13,19 @@ public class Account {
 
     private volatile int balance;
     private final int id;
+    private Bank bank;
 
-    public Account(int id, int initialBalance) {
+    public Account(Bank bank, int id, int initialBalance) {
         this.id = id;
         this.balance = initialBalance;
+        this.bank = bank;
     }
 
     public int getBalance() {
         return balance;
     }
 
-    public boolean withdraw(int amount) {
+    public synchronized boolean withdraw(int amount) {
         if (amount <= balance) {
             int currentBalance = balance;
             // Thread.yield(); // Try to force collision
@@ -33,11 +37,24 @@ public class Account {
         }
     }
 
-    public void deposit(int amount) {
+    public synchronized void deposit(int amount) {
         int currentBalance = balance;
         // Thread.yield();   // Try to force collision
         int newBalance = currentBalance + amount;
         balance = newBalance;
+        notifyAll();
+    }
+    
+    public synchronized void waitForAvailableFunds(int amount) {
+    	while (bank.isOpen() && (amount > balance)) {
+    		//System.out.printf("wait- Account %d, Balance %d, Amount %d\n", id, balance, amount);
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
     }
     
     @Override

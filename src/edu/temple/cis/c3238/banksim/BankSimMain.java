@@ -1,5 +1,7 @@
 package edu.temple.cis.c3238.banksim;
 
+import java.util.concurrent.Semaphore;
+
 /**
  * @author Cay Horstmann
  * @author Modified by Paul Wolfgang
@@ -27,12 +29,10 @@ public class BankSimMain {
         for(Thread thread : threads) {
             thread.join();
         }
-
+		System.out.printf("FINISHED\n");
         // Test to see whether the balances have remained the same
         // After all transactions have completed.
-        b.test();
+        //b.test();
           
     }
 }
-
-

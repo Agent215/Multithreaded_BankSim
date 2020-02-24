@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Bank {
 
     public static final int NTEST = 10;
-    private final Account[] accounts;
+    public final Account[] accounts;
     private long numTransactions = 0;
     private final int initialBalance;
     private final int numAccounts;

@@ -3,8 +3,10 @@
 ## General Design 
 
 This is the design of the BankSim before we made any modifications on it. 
+The race condition can occur when two threads are both inside the deposit method at the same time. For example they both could see the balance at 5000 when they enter then each independently add their own amount.  Instead of adding the amounts together  one overwrites the other.
 
-![UML sequence Diagram](https://github.com/3296Spring2020/banksim-multithreading-02-schultz-essel-teameffort/raw/master/BankSim.png)
+
+![UML sequence Diagram](https://github.com/3296Spring2020/banksim-multithreading-02-schultz-essel-teameffort/raw/coolBranch/BankSim%20(2).png)
 
 ## Requirements
 There were multiple requirements for this project. The primary goal was to reverse engineer a simple Banking simulation that utilized 

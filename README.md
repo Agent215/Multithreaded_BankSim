@@ -11,15 +11,15 @@ The race condition can occur when two threads are both inside the deposit method
 
 ![UML Sequence Solution](http to be)
 
-_thread1 begins the transfer() method on the Bank b which results in a wait (Task 4)_
-_thread1 returns from the waut because another thread has finished a deposit (Task 4)_
-_thread1 increment()s the atomic integer (Task 3)_
-_thread2 tries to run the test() method from Bank b (Task 3)_
-_thread2 waits within test method because the atomic integer is >0 signalling one thread has not completed it's full transfer (Task 3)_
-_thread1 finishes transfer and decrement()s the atomic integer (Task 3)_
-_thread2 wakes from busy waiting and executes the rest of test() (Task3)_
-_thread1 finishes it's execution loop and close()s b (Task 5)_
-_thread2 (and all other threads) call isOpen() and get a false causing them to break their execution loop (Task 5)_
+- _thread1 begins the transfer() method on the Bank b which results in a wait (Task 4)_
+- _thread1 returns from the waut because another thread has finished a deposit (Task 4)_
+- _thread1 increment()s the atomic integer (Task 3)_
+- _thread2 tries to run the test() method from Bank b (Task 3)_
+- _thread2 waits within test method because the atomic integer is >0 signalling one thread has not completed it's full transfer (Task 3)_
+- _thread1 finishes transfer and decrement()s the atomic integer (Task 3)_
+- _thread2 wakes from busy waiting and executes the rest of test() (Task3)_
+- _thread1 finishes it's execution loop and close()s b (Task 5)_
+- _thread2 (and all other threads) call isOpen() and get a false causing them to break their execution loop (Task 5)_
 
 ## Requirements
 There were multiple requirements for this project. The primary goal was to reverse engineer a simple Banking simulation that utilized 
@@ -38,8 +38,14 @@ Tasks 2 and 3 needed to be completed by different people.
 We exchanged phone numbers and schedules early on in the project to facilitate communication.
 On three different occasions we met up to work on tasks collaboratively. All other time we communicated via text and trello board.
 ### Zach Essel 
-     We originally a split up the tasks with me taking the evens and Brahm taking the odds.  We did task 1 and 2 together in lab the first day.  Then Brahm started to work on Task 3 while I worked on task 4 simultaneously.  This seemed like it would work well until we found our solutions where incompatible after I first merged them.  From that point on we met up to work together on the solution for a feww hours on several different days.  We didn't push changes that often because they rarely lived past testing, when we would then move on to something else.  Brahm programmed solution attempts that included semaphores and reentrant locks.  I tried solutions that included counting semaphores and barriers.  I'm not sure if any of these made it to a formal commit.  When we came up with our final solution together, a combination of busy waiting on the test and a counter, Brahm immediately began testing it.  He added yields, and multiple trials of increased transactions.  He also made the UML sequence diagram to represent the original race condition, both it's rough draft and final copy.  I created a UML diagram to show the execution of our solution.  Brahm also did the majority of work on the readme and edited the Trello board.
-     In the end my contributions were: Creating the Trello board, Task 2, some of Tasks 3-5, UML Diagram, some of the readme
+We originally a split up the tasks with me taking the evens and Brahm taking the odds.  We did task 1 and 2 together in lab the first day.  Then Brahm started to work on Task 3 while I worked on task 4 simultaneously.  This seemed like it would work well until we found our solutions where incompatible after I first merged them.  From that point on we met up to work together on the solution for a feww hours on several different days.  We didn't push changes that often because they rarely lived past testing, when we would then move on to something else.  Brahm programmed solution attempts that included semaphores and reentrant locks.  I tried solutions that included counting semaphores and barriers.  I'm not sure if any of these made it to a formal commit.  When we came up with our final solution together, a combination of busy waiting on the test and a counter, Brahm immediately began testing it.  He added yields, and multiple trials of increased transactions.  He also made the UML sequence diagram to represent the original race condition, both it's rough draft and final copy.  I created a UML diagram to show the execution of our solution.  Brahm also did the majority of work on the readme and edited the Trello board.
+
+In the end my contributions were: 
+- Creating the Trello board
+- Task 2
+- some of Tasks 3-5
+- UML Diagram
+- some of the readme
 ### Abraham Schultz
 - created initial UML sequence diagram for task 1.
 - In collaboration with Zach helped implement mutual exclusion for task 3.

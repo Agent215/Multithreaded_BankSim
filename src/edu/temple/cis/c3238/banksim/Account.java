@@ -28,7 +28,7 @@ public class Account {
     public synchronized boolean withdraw(int amount) {
         if (amount <= balance) {
             int currentBalance = balance;
-            // Thread.yield(); // Try to force collision
+           Thread.yield(); // Try to force collision
             int newBalance = currentBalance - amount;
             balance = newBalance;
             return true;
@@ -39,7 +39,7 @@ public class Account {
 
     public synchronized void deposit(int amount) {
         int currentBalance = balance;
-        // Thread.yield();   // Try to force collision
+        Thread.yield();   // Try to force collision
         int newBalance = currentBalance + amount;
         balance = newBalance;
         notifyAll();
@@ -49,9 +49,10 @@ public class Account {
     	while (bank.isOpen() && (amount > balance)) {
     		//System.out.printf("wait- Account %d, Balance %d, Amount %d\n", id, balance, amount);
 			try {
+			    // System.out.println("**waiting ");
 				wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			}
     	}

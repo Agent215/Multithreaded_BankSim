@@ -9,7 +9,7 @@ The race condition can occur when two threads are both inside the deposit method
 ![UML sequence Diagram](https://github.com/3296Spring2020/banksim-multithreading-02-schultz-essel-teameffort/raw/coolBranch/BankSim%20(3).png)
 
 
-![UML Sequence Solution](https://raw.githubusercontent.com/3296Spring2020/banksim-multithreading-02-schultz-essel-teameffort/coolBranch/UML%20Solution.png?token=AI265SNORDNFWT3M5CP6NHC6L2ISA)
+![UML Sequence Solution](https://github.com/Agent215/Multithreaded_BankSim/raw/master/UML%20Solution.png)
 
 - _thread1 begins the transfer() method on the Bank b which results in a wait (Task 4)_
 - _thread1 returns from the waut because another thread has finished a deposit (Task 4)_
